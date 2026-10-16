@@ -1,48 +1,48 @@
 name: Offline checks
- run-name: publication-${{ inputs.cycle || github.run_id }}
- on:
-   push:
-     branches: [main]
-   pull_request:
-   workflow_dispatch:
-     inputs:
-       cycle:
-         description: Synthetic publication cycle identifier
-         required: true
-         type: string
-       expected_sha:
-         description: Reviewed exact commit SHA
-         required: true
-         type: string
-       mode:
-         description: Explicit private JIT or public hosted route
-         required: true
-         type: choice
-         options: [private, public]
- permissions:
-   contents: read
- jobs:
-   offline-tests:
-     if: ${{ github.event_name != 'workflow_dispatch' && (!github.event.repository.private || (github.repository == 'gernalix/chatgpt-browser-support-clean' && vars.CI_JIT_HEAD_SHA != '' && github.sha == vars.CI_JIT_HEAD_SHA && startsWith(vars.CI_JIT_LABEL, 'p208-browser-jit-'))) || github.event_name == 'workflow_dispatch' && github.sha == inputs.expected_sha && ((inputs.mode == 'public' && !github.event.repository.private) || (inputs.mode == 'private' && github.event.repository.private && (github.repository == 'gernalix/chatgpt-browser-support-clean' && vars.CI_JIT_HEAD_SHA != '' && github.sha == vars.CI_JIT_HEAD_SHA && startsWith(vars.CI_JIT_LABEL, 'p208-browser-jit-')))) }}
-     runs-on: ${{ github.event.repository.private && (github.repository == 'gernalix/chatgpt-browser-support-clean' && vars.CI_JIT_HEAD_SHA != '' && github.sha == vars.CI_JIT_HEAD_SHA && startsWith(vars.CI_JIT_LABEL, 'p208-browser-jit-')) && vars.CI_JIT_LABEL || 'ubuntu-latest' }}
-     timeout-minutes: 10
-     steps:
-       - uses: actions/checkout@v4
-         with:
-           ref: ${{ github.sha }}
-           persist-credentials: false
-       - name: Verify exact checkout
-         env:
-           EXPECTED_SHA: ${{ github.sha }}
-         run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
-       - uses: actions/setup-python@v5
-         with:
-           python-version: '3.12'
-       - name: Install Python dependencies
-         run: python -m pip install 'playwright>=1.61' 'websockets>=15,<16'
-       - name: Run offline tests
-         env:
-           PYTHONPATH: src
-           PYTHONDONTWRITEBYTECODE: '1'
-         run: python -B -m unittest discover -s tests -v
- 
+run-name: publication-${{ inputs.cycle || github.run_id }}
+on:
+  push:
+    branches: [main, 'task/**']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      cycle:
+        description: Synthetic publication cycle identifier
+        required: true
+        type: string
+      expected_sha:
+        description: Reviewed exact commit SHA
+        required: true
+        type: string
+      mode:
+        description: Explicit private JIT or public hosted route
+        required: true
+        type: choice
+        options: [private, public]
+permissions:
+  contents: read
+jobs:
+  offline-tests:
+    if: ${{ github.event_name != 'workflow_dispatch' && (!github.event.repository.private || (github.repository == 'gernalix/chatgpt-browser-support-clean' && vars.CI_JIT_HEAD_SHA != '' && github.sha == vars.CI_JIT_HEAD_SHA && startsWith(vars.CI_JIT_LABEL, 'p208-browser-jit-'))) || github.event_name == 'workflow_dispatch' && github.sha == inputs.expected_sha && ((inputs.mode == 'public' && !github.event.repository.private) || (inputs.mode == 'private' && github.event.repository.private && (github.repository == 'gernalix/chatgpt-browser-support-clean' && vars.CI_JIT_HEAD_SHA != '' && github.sha == vars.CI_JIT_HEAD_SHA && startsWith(vars.CI_JIT_LABEL, 'p208-browser-jit-')))) }}
+    runs-on: ${{ github.event.repository.private && (github.repository == 'gernalix/chatgpt-browser-support-clean' && vars.CI_JIT_HEAD_SHA != '' && github.sha == vars.CI_JIT_HEAD_SHA && startsWith(vars.CI_JIT_LABEL, 'p208-browser-jit-')) && vars.CI_JIT_LABEL || 'ubuntu-latest' }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Verify exact checkout
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Python dependencies
+        run: TMPDIR="$RUNNER_TEMP" python -m pip install --no-cache-dir 'playwright>=1.61' 'websockets>=15,<16'
+      - name: Run offline tests
+        env:
+          PYTHONPATH: src
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python -B -m unittest discover -s tests -v
+
