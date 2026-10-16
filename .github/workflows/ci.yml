@@ -39,7 +39,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install Python dependencies
-        run: TMPDIR="$RUNNER_TEMP" python -m pip install --no-cache-dir 'playwright>=1.61' 'websockets>=15,<16'
+        run: TMPDIR="$RUNNER_TEMP" python -m pip install --no-cache-dir 'playwright>=1.61' 'websockets>=15,<16' 'PyYAML>=6,<7'
       - name: Run offline tests
         env:
           PYTHONPATH: src
