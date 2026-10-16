@@ -1,0 +1,8 @@
+[Unit]
+Description=Health check for ChatGPT RDC normal Chrome session
+After=chatgpt-rdc-supervisor.service
+ConditionPathExists=!%h/.config/c2/disable-chat-supervisor
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/share/chatgpt-rdc-supervisor/bin/browser-health.sh

@@ -1,0 +1,17 @@
+[Unit]
+Description=Approved channel bridge to the normal Chrome session
+After=graphical-session.target
+ConditionPathExists=!%h/.config/c2/disable-chat-supervisor
+StartLimitIntervalSec=10min
+StartLimitBurst=3
+
+[Service]
+Type=notify
+NotifyAccess=main
+ExecStart=%h/.local/share/chatgpt-rdc-supervisor/venv/bin/python3 %h/.local/share/chatgpt-rdc-supervisor/bin/channel-bridge.py
+Restart=on-failure
+RestartSec=30
+TimeoutStartSec=120
+
+[Install]
+WantedBy=default.target
