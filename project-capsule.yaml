@@ -1,0 +1,259 @@
+schema_version: c2.project-capsule.v1
+identity:
+  project_id: 105
+  slug: chatgpt-rdc-supervisor
+  repository_id: R0106
+scope:
+  purpose: Provide on-demand browser transport/helpers only, with retired global supervision
+    and lifecycle entrypoints remaining fail-closed.
+  boundaries:
+  - Do not launch/control a real browser, inspect accounts/projects or contact ChatGPT
+    during capsule verification.
+  - Global supervision, rollover/recovery, lifecycle registration/resume and historical
+    installers remain permanently retired.
+  - The systemd templates are inert source files, not a requested installation.
+repository:
+  canonical_workdir: /home/daniele/.local/share/megavault/worktrees/chatgpt-browser-support-clean
+  branch_policy: Use isolated task worktrees and the installed Git single writer;
+    preserve existing primary names, all valid work and concurrent ownership.
+architecture:
+  summary: src/chatgpt_rdc_supervisor/browser.py owns bounded browser channel/page/composer
+    operations; safety.py enforces launch checks; storage/model/checkpoint modules
+    hold private operation context. cli.py exposes requested diagnostics/helpers while
+    retired supervision, discovery, registration/resume and installers reject. Tests
+    use fake browser objects and temporary storage.
+  entrypoints:
+  - src/chatgpt_rdc_supervisor/cli.py
+  important_paths:
+  - src/chatgpt_rdc_supervisor
+  - tests
+  - README.md
+  - pyproject.toml
+dependencies:
+- name: Python and system SQLite where applicable
+  purpose: Existing source and isolated offline fixture checks.
+- name: Bubblewrap
+  purpose: Read-only source, masked private home/runtime/data/devices, isolated network
+    and processes.
+- name: Playwright and websockets
+  purpose: Existing browser transport dependencies; tests use fake objects, not a
+    real authenticated session.
+data:
+  schema: Browser endpoints, profiles, chat/session content and checkpoints belong
+    in private runtime storage outside Git. This package owns no task lifecycle, global
+    queue or external source of authority. Legacy module/command names are compatibility
+    only.
+  migrations: Preserve private checkpoints and existing source context; do not reactivate
+    retired control planes or infer a task resume from a doctor/connectivity result.
+    Source integration does not install inert service templates.
+runtime:
+  services: []
+  timers: []
+  containers: []
+devices: []
+commands:
+  setup:
+    not_applicable: Use existing global dependencies; no credential provisioning,
+      live installation or venv belongs in capsule checks.
+  build:
+    not_applicable: Python source has no required compiled build.
+  test_targeted:
+    argv:
+    - bwrap
+    - --die-with-parent
+    - --unshare-net
+    - --unshare-pid
+    - --ro-bind
+    - /
+    - /
+    - --tmpfs
+    - /home
+    - --tmpfs
+    - /run
+    - --tmpfs
+    - /tmp
+    - --tmpfs
+    - /mnt
+    - --tmpfs
+    - /media
+    - --tmpfs
+    - /var/lib
+    - --proc
+    - /proc
+    - --dev
+    - /dev
+    - --ro-bind
+    - .
+    - /tmp/work
+    - --chdir
+    - /tmp/work
+    - --clearenv
+    - --setenv
+    - PATH
+    - /usr/bin:/bin
+    - --setenv
+    - HOME
+    - /tmp
+    - --setenv
+    - PYTHONPATH
+    - /tmp/work:/tmp/work/src
+    - --setenv
+    - PYTHONDONTWRITEBYTECODE
+    - '1'
+    - /usr/bin/python3
+    - -B
+    - -m
+    - unittest
+    - discover
+    - -s
+    - tests
+    - -p
+    - test_pre_migration_retirement.py
+    - -v
+    cwd: .
+  test_full:
+    argv: &id001
+    - bwrap
+    - --die-with-parent
+    - --unshare-net
+    - --unshare-pid
+    - --ro-bind
+    - /
+    - /
+    - --tmpfs
+    - /home
+    - --tmpfs
+    - /run
+    - --tmpfs
+    - /tmp
+    - --tmpfs
+    - /mnt
+    - --tmpfs
+    - /media
+    - --tmpfs
+    - /var/lib
+    - --proc
+    - /proc
+    - --dev
+    - /dev
+    - --ro-bind
+    - .
+    - /tmp/work
+    - --chdir
+    - /tmp/work
+    - --clearenv
+    - --setenv
+    - PATH
+    - /usr/bin:/bin
+    - --setenv
+    - HOME
+    - /tmp
+    - --setenv
+    - PYTHONPATH
+    - /tmp/work:/tmp/work/src
+    - --setenv
+    - PYTHONDONTWRITEBYTECODE
+    - '1'
+    - /usr/bin/python3
+    - -B
+    - -m
+    - unittest
+    - discover
+    - -s
+    - tests
+    - -v
+    cwd: .
+  lint:
+    argv:
+    - git
+    - diff
+    - --check
+    cwd: .
+  deploy_install:
+    not_applicable: Use the existing specialist operational procedure only within
+      its separately requested scope.
+  smoke:
+    not_applicable: Live services, providers, browsers, data stores and retired control-plane
+      operations are not capsule hooks.
+  verify:
+    fast:
+      argv:
+      - python3
+      - /home/daniele/projects/codex-roadmap/tools/project_capsule.py
+      - --repo
+      - .
+      - --mode
+      - FAST
+      cwd: .
+    full:
+      argv:
+      - python3
+      - /home/daniele/projects/codex-roadmap/tools/project_capsule.py
+      - --repo
+      - .
+      - --mode
+      - FULL
+      cwd: .
+safety:
+  invariants:
+  - No browser credentials, profile/session data, private conversations or endpoints
+    with secrets in Git/output.
+  - Real operations require a separately authorized session and must preserve ownership/launch-safety
+    boundaries.
+  - No implicit task claiming, Pn/Batch creation or retired lifecycle writes.
+  risky_operations:
+  - Real database rebuild/migration, deployment, credential cutover, lifecycle/notification
+    and browser operations require the appropriate explicit scope.
+  recovery:
+  - Preserve original source/data and prior good copies; use owning semantic writers
+    and consistent private backups.
+acceptance:
+- FAST validates registered identity, referenced source paths, commands and reviewed-source
+  freshness.
+- FULL passes the declared isolated suite; it does not infer live runtime, account,
+  archive or data completeness.
+- No service, credentials, provider, private source or existing database is changed
+  during capsule verification.
+references:
+  megavault: /home/daniele/MegaVault/megavault.sqlite
+  c2: Historical-only /home/daniele/projects/codex-roadmap/roadmap.sqlite; no lifecycle
+    writes or dispatcher use.
+freshness:
+  reviewed_commit: 0994ad1ea4b5be2564a59aadea494716e81adaed
+  watch_paths:
+  - src
+  - scripts
+  - systemd
+  - tests
+  - pyproject.toml
+  - NV.txt
+artifacts:
+  agents: AGENTS.md
+  architecture: README.md
+  operations: README.md
+  data_model: src/chatgpt_rdc_supervisor/storage.py
+validation_hooks:
+- id: isolated-offline-suite
+  argv: *id001
+  cwd: .
+  safe: true
+change_verification:
+- paths:
+  - project-capsule.yaml
+  - AGENTS.md
+  - '*.md'
+  commands:
+  - lint
+- paths:
+  - '*.py'
+  - ai/*
+  - tools/*
+  - src/*
+  - systemd/*
+  - tests/*
+  - scripts/*
+  - workflows/*
+  - docker-compose.yml
+  - requirements.txt
+  commands:
+  - test_full
